@@ -1,16 +1,25 @@
 import cv2
 import requests
 import datetime
+import numpy
 
 
 def f(samples, img):
     print("info:", samples)
     if (len(samples) >= 5):
-        requests.post('http://192.168.0.20/api/micro/createRegistry', data={
-            "username": "joserapiw",
-            "image": img,
-            "sample_qty": len(faces)
-        })
+        stream = open("test.png", "rb")
+        bytes = bytearray(stream.read())
+        numpyarray = numpy.asarray(bytes, dtype=numpy.uint8)
+        bgrImage = cv2.imdecode(numpyarray, cv2.IMREAD_UNCHANGED)
+#
+        x = requests.post(
+            'http://192.168.0.20/api/micro/createRegistry', data={
+                "username": "joserapiw",
+                "sample_qty": len(faces),
+                'image': ("test", bgrImage, 'multipart/form-data', {'Expires': '0'}),
+            })
+
+        print(x.text)
 
 
 # We load the training data for our ML model
@@ -45,12 +54,14 @@ while True:
     print("bip")
     # Display the image on our desktop
     cv2.imshow('img', img)
+    cv2.imwrite("test.png", img)
     now = datetime.datetime.now()
     if now - last > datetime.timedelta(seconds=10):
         #    retval, buffer = cv2.imencode('.jpg', img)
         #    jpg_as_text = base64.b64encode(buffer)
         #    print(jpg_as_text)
-        f(faces)
+        f(faces, img)
+
         last = now
         print('Elapsed: ' + str(now-start) + ' | Iteration #')
     # Stop if escape key is pressed
