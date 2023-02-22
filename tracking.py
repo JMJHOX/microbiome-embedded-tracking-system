@@ -6,7 +6,7 @@ import numpy
 
 def f(samples, img):
     print("info:", samples)
-    if (len(samples) >= 5):
+    if (len(samples) >= 3):
         stream = open("test.png", "rb")
         bytes = bytearray(stream.read())
         numpyarray = numpy.asarray(bytes, dtype=numpy.uint8)
